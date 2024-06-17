@@ -1,29 +1,24 @@
-it('should correctly rotate the minute hand', () => {
+const secondHand = document.querySelector('.second-hand');
+const minuteHand = document.querySelector('.min-hand');
+const hourHand = document.querySelector('.hour-hand');
+
+function setDate() {
   const now = new Date();
-  const mins = now.getMinutes();
-  const minsDegrees = 6 * mins + 90;
-  const radians = minsDegrees * Math.PI / 180;
 
-  // Calculate expected values of the rotation matrix
-  const expectedA = Math.cos(radians);
-  const expectedB = Math.sin(radians);
-  const expectedC = -expectedB;
-  const expectedD = expectedA;
+  // Seconds
+  const seconds = now.getSeconds();
+  const secondsDegrees = ((seconds / 60) * 360) + 90; // 90 degrees offset to start at 12 o'clock
+  secondHand.style.transform = `rotate(${secondsDegrees}deg)`;
 
-  // Get the current transform matrix of .min-hand
-  cy.get('.min-hand').invoke('css', 'transform').then(transform => {
-    // Parse the transform matrix into its components
-    const matrix = transform.split('(')[1].split(')')[0].split(',').map(parseFloat);
-    const actualA = matrix[0];
-    const actualB = matrix[1];
-    const actualC = matrix[2];
-    const actualD = matrix[3];
+  // Minutes
+  const minutes = now.getMinutes();
+  const minutesDegrees = ((minutes / 60) * 360) + ((seconds / 60) * 6) + 90;
+  minuteHand.style.transform = `rotate(${minutesDegrees}deg)`;
 
-    // Compare the actual and expected values within a tolerance
-    const tolerance = 0.01; // Adjust tolerance level as needed
-    expect(actualA).to.be.closeTo(expectedA, tolerance);
-    expect(actualB).to.be.closeTo(expectedB, tolerance);
-    expect(actualC).to.be.closeTo(expectedC, tolerance);
-    expect(actualD).to.be.closeTo(expectedD, tolerance);
-  });
-});
+  // Hours
+  const hours = now.getHours();
+  const hoursDegrees = ((hours / 12) * 360) + ((minutes / 60) * 30) + 90;
+  hourHand.style.transform = `rotate(${hoursDegrees}deg)`;
+}
+
+setInterval(setDate, 1000); // Update every second
